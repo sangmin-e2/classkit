@@ -1,0 +1,5 @@
+{
+  "name": "Classroom Kit",
+  "description": "A smart utility suite for teachers including QR Generator, Random Picker, Stopwatch, and Dice Roller.",
+  "requestFramePermissions": []
+}
