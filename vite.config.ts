@@ -3,26 +3,23 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-  // Vercel 환경 변수와 로컬 .env를 모두 안전하게 로드합니다.
+  // 1. 환경 변수 로드 (Vercel에 설정한 GEMINI_API_KEY를 가져옵니다)
   const env = loadEnv(mode, process.cwd(), '');
+  // Vercel 환경과 로컬 환경 어디서든 키를 찾도록 안전장치를 걸었습니다.
+  const apiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
 
   return {
-    server: {
-      port: 3000,
-      host: '0.0.0.0',
-    },
+    server: { port: 3000, host: '0.0.0.0' },
     plugins: [react()],
-    // define 부분 수정: 키 값이 없어도 에러가 안 나도록 빈 문자열('') 처리를 추가했습니다.
     define: {
-      'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || ''),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '')
+      // 2. 앱 안에서 process.env.GEMINI_API_KEY로 쓸 수 있게 연결
+      'process.env.GEMINI_API_KEY': JSON.stringify(apiKey),
+      'process.env.API_KEY': JSON.stringify(apiKey) 
     },
     resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-      }
+      alias: { '@': path.resolve(__dirname, '.') }
     },
-    // base 설정: 배포 시 경로 에러 방지
+    // 3. 하얀 화면 해결의 핵심! (경로를 기본값으로 고정)
     base: '/',
   };
 });
